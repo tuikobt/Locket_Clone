@@ -24,6 +24,7 @@ export default function SignInScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { signin } = useAuth();
+  const { forgotPassword } = useAuth();
 
   const navigation = useNavigation();
 
@@ -50,6 +51,42 @@ export default function SignInScreen() {
       else errorMessage = "Sign in failed";
 
       Alert.alert("Error", errorMessage);
+    }
+  };
+
+  const handleSendResetPassword = async () => {
+    setLoading(true);
+    try {
+      const result = await forgotPassword(email);
+
+      if (result.success) {
+        Alert.alert("Success", "Send reset password successfully");
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("SignIn"),
+          },
+        ];
+      } else {
+        let errorMessage;
+
+        if (result.error.includes("user-not-found"))
+          errorMessage = "User not found";
+        else if (result.error.includes("invalid-email"))
+          errorMessage = "Invalid email";
+        else if (result.error.includes("too-many-requests"))
+          errorMessage = "Too many requests. Please try again later.";
+        else if (result.error.includes("network-request-failed"))
+          errorMessage =
+            "Network request failed. Please check your internet connection.";
+        else errorMessage = "Send reset password failed";
+
+        Alert.alert("Error", errorMessage);
+        setLoading(false);
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+      setLoading(false);
     }
   };
 
@@ -123,7 +160,7 @@ export default function SignInScreen() {
               ) : (
                 <TouchableOpacity
                   style={styles.forgotPassword}
-                  onPress={() => navigation.navigate("ForgotPassword")}
+                  onPress={handleSendResetPassword}
                 >
                   <Text style={styles.forgotPasswordText}>
                     Forgot Password?
