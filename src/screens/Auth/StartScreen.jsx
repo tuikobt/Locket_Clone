@@ -35,6 +35,10 @@ export default function StartScreen() {
     navigation.navigate("SignUp");
   };
 
+  const handleSignIn = () => {
+    navigation.navigate("SignIn");
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
@@ -73,7 +77,9 @@ export default function StartScreen() {
 
         {/* Nút “Sign in” */}
         <TouchableOpacity>
-          <Text style={styles.signInText}>Sign in</Text>
+          <Text style={styles.signInText} onPress={handleSignIn}>
+            Sign in
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

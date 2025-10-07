@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,26 +10,68 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+// Giả định đường dẫn và các hàm này đã đúng
+import { validateEmail, validatePassword } from "../../utils/Validation";
+import useAuth from "../../hook/useAuth";
 
-export default function EmailInputScreen() {
+export default function SignUpScreen() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { signup } = useAuth();
 
   const navigation = useNavigation();
 
-  const isEmailValid = email.trim() !== "";
-  const isPasswordValid = password.length >= 8;
+  // ✅ SỬ DỤNG useMemo để tính toán trạng thái hợp lệ (chỉ tính khi email/password thay đổi)
+  const isEmailValid = useMemo(() => validateEmail(email.trim()), [email]);
+  const isPasswordValid = useMemo(
+    () => validatePassword(password.trim()),
+    [password]
+  );
 
+  const handleSignUp = async () => {
+    setLoading(true);
+    const result = await signup(email, password);
+    setLoading(false);
+
+    if (result.success) {
+      // SỬA LỖI TẠI ĐÂY: Alert.alert cần 3 tham số (title, message, buttonsArray)
+      Alert.alert("Success", "Sign up successfully", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("SignIn"),
+        },
+      ]);
+    } else {
+      let errorMessage;
+
+      if (result.error.includes("email-already-in-use"))
+        errorMessage = "Email already in use";
+      else errorMessage = "Sign up failed";
+
+      Alert.alert("Error", errorMessage);
+    }
+  };
+
+  // --- LOGIC CHUYỂN BƯỚC ĐÃ SỬA ---
   const handleContinue = () => {
-    if (step === 1 && isEmailValid) {
+    if (step === 1) {
+      if (!isEmailValid) {
+        return;
+      }
+
       setStep(2);
-    } else if (step === 2 && isPasswordValid) {
-      console.log("Email:", email, "Password:", password);
+    } else if (step === 2) {
+      if (!isPasswordValid) {
+        return;
+      }
+      handleSignUp();
     }
   };
 
@@ -45,7 +87,6 @@ export default function EmailInputScreen() {
         style={{ flex: 1, backgroundColor: "#000" }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* ✅ Đưa nút back ra ngoài TouchableWithoutFeedback */}
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
@@ -74,7 +115,7 @@ export default function EmailInputScreen() {
                   placeholderTextColor="#999"
                   value={password}
                   onChangeText={setPassword}
-                  secureTextEntry
+                  secureTextEntry={true}
                 />
               )}
 
@@ -103,6 +144,7 @@ export default function EmailInputScreen() {
                 : styles.buttonInactive,
             ]}
             onPress={handleContinue}
+            // ✅ Đã sửa logic disabled bằng cách sử dụng các biến boolean
             disabled={
               (step === 1 && !isEmailValid) || (step === 2 && !isPasswordValid)
             }

@@ -5,13 +5,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import StartScreen from "./src/screens/Auth/StartScreen";
 import SignUpScreen from "./src/screens/Auth/SignUpScreen";
 import AuthNavigation from "./src/navigations/AuthNavigation";
+import AuthProvider from "./src/context/AuthContext";
 
 export default function App() {
   return (
-    <SafeAreaProvider style={styles.container}>
-      <NavigationContainer>
-        <AuthNavigation />
-      </NavigationContainer>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <NavigationContainer>
+          <AuthNavigation />
+        </NavigationContainer>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }
