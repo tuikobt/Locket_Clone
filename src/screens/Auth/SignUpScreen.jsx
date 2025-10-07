@@ -45,7 +45,7 @@ export default function SignUpScreen() {
       Alert.alert("Success", "Sign up successfully", [
         {
           text: "OK",
-          onPress: () => navigation.navigate("SignIn"),
+          onPress: () => navigation.navigate("Start"),
         },
       ]);
     } else {
