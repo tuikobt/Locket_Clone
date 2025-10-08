@@ -6,15 +6,20 @@ import StartScreen from "./src/screens/Auth/StartScreen";
 import SignUpScreen from "./src/screens/Auth/SignUpScreen";
 import AuthNavigation from "./src/navigations/AuthNavigation";
 import AuthProvider from "./src/context/AuthContext";
+import HomeScreen from "./src/screens/Home/HomeScreen";
 
 export default function App() {
   return (
-    <SafeAreaProvider>
+    /*<SafeAreaProvider>
       <AuthProvider>
         <NavigationContainer>
           <AuthNavigation />
         </NavigationContainer>
       </AuthProvider>
+    </SafeAreaProvider>*/
+
+    <SafeAreaProvider>
+      <HomeScreen />
     </SafeAreaProvider>
   );
 }
@@ -22,7 +27,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#000",
     alignItems: "center",
     justifyContent: "center",
   },
